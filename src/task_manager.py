@@ -4,23 +4,19 @@ import sys
 
 DB_NAME = 'task_manager'
 DESCRIPTION = 'example description'
-IN_DEBUG_MODE = False
+IN_DEBUG_MODE = True
 
 def runQuery(outfilename: str, infile: str):
     query = infile.read()
 
     if IN_DEBUG_MODE:
         print(query)
-        return
     
     connection = sqlite3.connect(f'./{outfilename}')
     cursor = connection.cursor()
     
-    try:
-        cursor.execute(query)
-        connection.commit()
-    except:
-        print("invalid query")
+    cursor.execute(query)
+    connection.commit()
         
     connection.close()
 
@@ -31,18 +27,18 @@ def main():
         description=DESCRIPTION
     )
 
-    parser.add_argument('-o', '--output_file')
     parser.add_argument('-f', '--input_file')
+    parser.add_argument('-o', '--output_file')
 
     args = parser.parse_args()
-
-    if args.output_file is None:
-        outfilename = f'./{DB_NAME}.db'
 
     if args.input_file is None:
         infile = sys.stdin
     else:
         infile = open(args.input_file, 'r')
+        
+    if args.output_file is None:
+        outfilename = f'./data/{DB_NAME}.db'
     
     runQuery(outfilename, infile)
     if infile != sys.stdin:
